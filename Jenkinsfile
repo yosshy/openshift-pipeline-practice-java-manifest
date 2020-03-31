@@ -10,7 +10,7 @@ pipeline {
   agent {
     kubernetes {
       cloud 'openshift'
-      label: 'maven'
+      label 'maven'
     }
   }
 
