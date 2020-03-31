@@ -15,12 +15,6 @@ pipeline {
   }
 
   stages {
-    stage('Checkout Source') {
-      steps {
-        scmSkip(deleteBuild: false)
-      }
-    }
-
     stage('deploy to prod') {
       when {
         expression {
@@ -29,12 +23,12 @@ pipeline {
       }
 
       steps {
-        echo "deploy"
+        scmSkip(deleteBuild: false)
         script {
           openshift.withCluster() {
             openshift.withProject("${prod_project}") {
               // Apply application manifests
-              openshift.apply(openshift.process('-f', 'openshift/application-deploy.yaml', '-p', "NAME=${app_name}", '-p', "APP_IMAGE=${app_image}"))
+              openshift.apply(openshift.process('-f', 'application-deploy.yaml', '-p', "NAME=${app_name}", '-p', "APP_IMAGE=${app_image}"))
 
               // Wait for application to be deployed
               def dc = openshift.selector("dc", "${app_name}").object()
