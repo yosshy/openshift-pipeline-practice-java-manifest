@@ -5,7 +5,7 @@
 - Argo CD用のProjectの作成（`oc new-project userX-argocd` で作成）しておくこと
 - クラスタ管理者で、事前に利用するProjectに対してArgo CD Operatorをインストールしておくこと
 - 本レポジトリをフォークしておくこと
-  - フォーク先のレポジトリで、`argocd/application-deploy.yaml` の `image: image-registry.openshift-image-registry.svc:5000/userX-development/pipeline-practice-java:latest` にて、`userX-deployment` を適切な値に変更しておくこと
+  - フォーク先のレポジトリで、`argocd/application-deploy.yaml` の `image: image-registry.openshift-image-registry.svc:5000/userX-development/pipeline-practice-java:latest` にて、`userX-development` を適切な値に変更しておくこと
 
 ## Argo CDのインストール
 Argo CDはOperatorを用いて簡単にインストールすることが可能です。
@@ -78,7 +78,7 @@ Argo CDが利用するService Account(`argocd-application-controller`)に対し�
 `userX` の `X` 部分を適切なものに変更し、権限を付与します。
 
 ```
-$ oc policy add-role-to-user edit system:serviceaccount:userX-argocd:argocd-application-controller -n userX-application
+$ oc policy add-role-to-user edit system:serviceaccount:userX-argocd:argocd-application-controller -n userX-development
 clusterrole.rbac.authorization.k8s.io/edit added: "system:serviceaccount:user2-argocd:argocd-application-controller"
 ```
 
@@ -93,7 +93,7 @@ Argo CDのコンソールにアクセス後、`NEW APP`を選択しアプリケ�
     - SYNC OPTIONS: `USE A SCHEMA TO VALIDATE RESOURCE MANIFESTS`のチェックを外す
 - SOURCE:
     - Repository URL: フォークした`openshift-pipeline-practice-java-manifest`のURL
-    - Revision: `master`
+    - Revision: `HEAD`
     - Path: `argocd`
 - DESTINATION
     - Cluster: `in-cluster`
@@ -194,3 +194,26 @@ Argo CDのコンソールから不要になったリソースを確認できる�
 
 また、`APP DETAILS`から`Sync Policy`で`Prune Resources`を有効化して同じことを行ってみましょう。  
 今度は自動で不要になったリソースを削除してくれるはずです。
+
+お手軽に追加できるリソースのサンプルです。
+
+```
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: argocd-test-secret
+  stringData:
+    database-password: password
+    database-user: test
+```
+
+## プルリクエストでデプロイ管理
+実際の開発フローでは、マニフェストレポジトリの`master`ブランチに対して直接の編集を行うことは、多くありません。マニフェストについてもプルリクエストを用いて、マニフェストの修正のレビューとマージを行っていきます。
+
+試しに、別ブランチでマニフェストの修正を行って、`master`ブランチに対してプルリクエストを送ってみましょう。その後にマージをして変更をデプロイしてみましょう。
+
+![pull-requests](images/argocd-pull-request.png)
+
+## オプション
+前に行ったJenkinsのパイプラインでは、デプロイ作業まですべて行っていましたが、デプロイ及び結合テストのStageを削除し、イメージ作成まで処理を変更してみましょう。
+その後、Argo CDのマニフェストレポジトリで、アプリケーションのイメージのタグを`latest`から指定したイメージタグに変更してデプロイしてみましょう。
