@@ -138,6 +138,7 @@ spec:
 アプリケーションの登録が完了したら`SYNC`ボタンを押して、OpenShiftとマニフェストの状態を同期します。
 下記のように期待するリソースがすべてデプロイされていれば完了です。
 一部のリソース（DeploymentConfig、Route）がOut of syncで黄色くなっていますが、これはCRDであるが故です。
+(Custom Health Checkについては[こちら](https://argoproj.github.io/argo-cd/operator-manual/health/))
 
 ![synced](images/argocd-synced.png)
 
