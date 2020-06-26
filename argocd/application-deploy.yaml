@@ -51,7 +51,7 @@ items:
       template: sample-spring-boot
     name: argocd-pipeline-practice-java
   spec:
-    replicas: 2
+    replicas: 3
     selector:
       name: argocd-pipeline-practice-java
     strategy: null
