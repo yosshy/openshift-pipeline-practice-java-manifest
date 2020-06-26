@@ -11,6 +11,13 @@ items:
     database-password: password
     database-user: freelancer
 - apiVersion: v1
+  kind: Secret
+  metadata:
+    name: argocd-test-secret
+  stringData:
+    database-password: password
+    database-user: test
+- apiVersion: v1
   kind: Service
   metadata:
     labels:
